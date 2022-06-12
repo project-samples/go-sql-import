@@ -1,0 +1,7 @@
+server:
+  name: read-write-file-function
+  port: 8084
+
+sql:
+  driver: mysql
+  data_source_name: root:abcd1234@/masterdata?charset=utf8&parseTime=True&loc=Local
