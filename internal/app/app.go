@@ -27,10 +27,16 @@ func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
 		return fullPath
 	}
 	userType := reflect.TypeOf(User{})
-	formatReader := NewFixedLengthFormatter(userType)
+	formatter, err := NewFixedLengthFormatter(userType)
+	if err != nil {
+		return nil, err
+	}
 	reader, err := NewFileReader(generateFileName)
+	if err != nil {
+		return nil, err
+	}
 	writer := q.NewStreamWriter(db, "users", userType, 500)
-	importer := NewImporter(db, userType, formatReader.ToStruct, func(ctx context.Context, data interface{}, endLineFlag bool) error {
+	importer := NewImporter(db, userType, formatter.ToStruct, func(ctx context.Context, data interface{}, endLineFlag bool) error {
 		fmt.Println(data)
 		ctx = context.Background()
 		if endLineFlag {

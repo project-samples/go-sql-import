@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/core-go/config"
+	"github.com/core-go/log"
+	"github.com/core-go/log/rotatelogs"
 
 	"go-service/internal/app"
 )
@@ -14,16 +16,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
+	log.Initialize(conf.Log, rotatelogs.GetWriter)
 	fmt.Println("Import file")
 	ctx := context.Background()
+	log.Info(ctx, "Import file")
 	app, err := app.NewApp(ctx, conf)
 	if err != nil {
+		log.Errorf(ctx, "Error when initialize: %v", err)
 		panic(err)
 	}
 
 	err = app.Import(ctx)
 	if err != nil {
+		log.Errorf(ctx, "Error when import: %v", err)
 		panic(err)
 	}
+	log.Info(ctx, "Imported file")
 }
