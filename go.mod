@@ -4,10 +4,11 @@ go 1.15
 
 require (
 	github.com/core-go/config v0.1.0
-	github.com/core-go/io v0.1.1
+	github.com/core-go/io v0.1.4
 	github.com/core-go/log v0.1.2
 	github.com/core-go/sql v0.3.5
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
+	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/lestrrat/go-envload v0.0.0-20180220120943-6ed08b54a570 // indirect

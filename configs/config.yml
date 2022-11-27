@@ -1,6 +1,11 @@
 sql:
   driver: mysql
-  data_source_name: root:abcd1234@/masterdata?charset=utf8&parseTime=True&loc=Local
+  host: b3xlz3mvmxmvbovqthbz-mysql.services.clever-cloud.com
+  port: 3306
+  user: uoavvvqbdbvw8xhg
+  password: 7oC90oma1uYdqBH4Fhug
+  database: b3xlz3mvmxmvbovqthbz
+#  data_source_name: sql6527643:mjrF7i7iMJ@sql6.freemysqlhosting.net:3306/sql6527643?charset=utf8&parseTime=True&loc=Local
 
 log:
   level: info

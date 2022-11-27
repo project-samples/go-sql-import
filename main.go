@@ -26,7 +26,8 @@ func main() {
 		panic(err)
 	}
 
-	err = app.Import(ctx)
+	total, success, err := app.Import(ctx)
+	fmt.Println(fmt.Sprintf("total: %d, success: %d", total, success))
 	if err != nil {
 		log.Errorf(ctx, "Error when import: %v", err)
 		panic(err)
