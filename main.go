@@ -17,7 +17,6 @@ func main() {
 		panic(err)
 	}
 	log.Initialize(cfg.Log, rotatelogs.GetWriter)
-	fmt.Println("Import file")
 	ctx := context.Background()
 	log.Info(ctx, "Import file")
 	app, err := app.NewApp(ctx, cfg)
