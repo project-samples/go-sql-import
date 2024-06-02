@@ -57,7 +57,7 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	writer := w.NewStreamWriter(db, "userimport", userType, 6)
 	w2 := &UserWriter{writer}
 	// writer := q.NewInserter(db, "userimport", userType)
-	importer := importer.NewImporter[User](transformer.ToStruct, reader.Read, errorHandler.HandleException, validator.Validate, errorHandler.HandleError, filename, w2.Write, writer.Flush)
+	importer := importer.NewImporter[User](reader.Read, transformer.Transform, validator.Validate, errorHandler.HandleError, errorHandler.HandleException, filename, w2.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
 }
 

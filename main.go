@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+
 	"github.com/core-go/config"
 	"github.com/core-go/log"
 	"github.com/core-go/log/rotatelogs"
@@ -26,10 +27,10 @@ func main() {
 	}
 
 	total, success, err := app.Import(ctx)
-	fmt.Println(fmt.Sprintf("total: %d, success: %d", total, success))
 	if err != nil {
 		log.Errorf(ctx, "Error when import: %v", err)
 		panic(err)
 	}
+	log.Info(ctx, fmt.Sprintf("total: %d, success: %d", total, success))
 	log.Info(ctx, "Imported file")
 }
