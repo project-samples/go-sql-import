@@ -48,15 +48,15 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
+	validator, err := v.NewValidator[*User]()
+	if err != nil {
+		return nil, err
+	}
 	errorHandler := importer.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
 	userType := reflect.TypeOf(User{})
 	writer := w.NewStreamWriter(db, "userimport", userType, 6)
 	w2 := &UserWriter{writer}
 	// writer := q.NewInserter(db, "userimport", userType)
-	validator, err := v.NewValidator[*User]()
-	if err != nil {
-		return nil, err
-	}
 	importer := importer.NewImporter[User](transformer.ToStruct, reader.Read, errorHandler.HandleException, validator.Validate, errorHandler.HandleError, filename, w2.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
 }
