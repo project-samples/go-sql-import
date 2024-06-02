@@ -48,7 +48,7 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
-	logError := importer.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
+	errorHandler := importer.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
 	userType := reflect.TypeOf(User{})
 	writer := w.NewStreamWriter(db, "userimport", userType, 6)
 	w2 := &UserWriter{writer}
@@ -57,7 +57,7 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
-	importer := importer.NewImporter[User](transformer.ToStruct, reader.Read, logError.HandleException, validator.Validate, logError.HandleError, filename, w2.Write, writer.Flush)
+	importer := importer.NewImporter[User](transformer.ToStruct, reader.Read, errorHandler.HandleException, validator.Validate, errorHandler.HandleError, filename, w2.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
 }
 
