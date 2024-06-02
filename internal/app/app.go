@@ -2,13 +2,13 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
 	"reflect"
 	"time"
 
-	imp "github.com/core-go/io/import"
+	"github.com/core-go/io/importer"
 	"github.com/core-go/io/reader"
+	"github.com/core-go/io/reader/formatter"
 	v "github.com/core-go/io/validator"
 	"github.com/core-go/log"
 	q "github.com/core-go/sql"
@@ -20,34 +20,23 @@ type ApplicationContext struct {
 	Import func(ctx context.Context) (int, int, error)
 }
 
-func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
-	db, err := q.OpenByConfig(conf.Sql)
+func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
+	db, err := q.OpenByConfig(cfg.Sql)
 	if err != nil {
 		return nil, err
 	}
 	userType := reflect.TypeOf(User{})
-	csvType := reader.DelimiterType
+	fileType := reader.DelimiterType
 	filename := ""
-	test := ""
-	if csvType == reader.DelimiterType {
+	if fileType == reader.DelimiterType {
 		filename = "delimiter.csv"
-		test = "10,abraham59E,rory30@example.com,975-283-2267,TRUE,2019-02-20"
 	} else {
 		filename = "fixedlength.csv"
-		test = "00000000001 abraham59             rory30@example.com        975-283-2267 true2019-02-20"
 	}
 	generateFileName := func() string {
 		fullPath := filepath.Join("export", filename)
 		return fullPath
 	}
-	formatter, err := reader.NewFormater(userType, csvType)
-	if err != nil {
-		return nil, err
-	}
-	// test formatter ToStruct
-	var user User
-	formatter.ToStruct(ctx, test, &user)
-	fmt.Println("user", user)
 	//reader, err := NewFixedlengthFileReader(generateFileName)
 	reader, err := reader.NewDelimiterFileReader(generateFileName)
 	if err != nil {
@@ -57,11 +46,19 @@ func NewApp(ctx context.Context, conf Config) (*ApplicationContext, error) {
 		"app": "import users",
 		"env": "dev",
 	}
-	logError := imp.NewErrorHandler(log.ErrorFields, "fileName", "lineNo", &mp)
+	ff2, err := formatter.NewDelimiterFormatter[User](",")
+	if err != nil {
+		return nil, err
+	}
+	logError := importer.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
 	writer := writer.NewStreamWriter(db, "userimport", userType, 6)
+	w2 := &UserWriter{writer}
 	// writer := q.NewInserter(db, "userimport", userType)
-	validator := v.NewValidator()
-	importer := imp.NewImporter(userType, formatter.ToStruct, reader.Read, logError.HandlerException, validator.Validate, logError.HandlerError, filename, writer.Write, writer.Flush)
+	validator, err := v.NewValidator[*User]()
+	if err != nil {
+		return nil, err
+	}
+	importer := importer.NewImporter[User](ff2.ToStruct, reader.Read, logError.HandleException, validator.Validate, logError.HandleError, filename, w2.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
 }
 
@@ -72,5 +69,17 @@ type User struct {
 	Phone       string     `json:"phone" gorm:"column:phone" bson:"phone" dynamodbav:"phone" firestore:"phone" length:"20" validate:"required,max=18"`
 	Status      bool       `json:"status" gorm:"column:status" true:"1" false:"0" bson:"status" dynamodbav:"status" format:"%5s" length:"5" firestore:"status"`
 	CreatedDate *time.Time `json:"createdDate" gorm:"column:createdDate" bson:"createdDate" length:"10" format:"dateFormat:2006-01-02" dynamodbav:"createdDate" firestore:"createdDate" validate:"required"`
-	// Test        string     `json:"phone" gorm:"column:phone" bson:"phone" dynamodbav:"phone" firestore:"phone" length:"1" validate:"required,max=18"`
+	Test        string     `json:"test" gorm:"-" bson:"phone" dynamodbav:"phone" firestore:"phone" length:"0" format:"-"`
+}
+
+type UserWriter struct {
+	wr *writer.StreamWriter
+}
+
+func (w *UserWriter) Write(ctx context.Context, model *User) error {
+	return w.wr.Write(ctx, model)
+}
+
+func (w *UserWriter) Flush(ctx context.Context) error {
+	return w.wr.Flush(ctx)
 }
