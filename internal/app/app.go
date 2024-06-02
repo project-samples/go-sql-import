@@ -8,11 +8,11 @@ import (
 
 	"github.com/core-go/io/importer"
 	"github.com/core-go/io/reader"
-	"github.com/core-go/io/reader/formatter"
+	"github.com/core-go/io/transform"
 	v "github.com/core-go/io/validator"
 	"github.com/core-go/log"
 	q "github.com/core-go/sql"
-	"github.com/core-go/sql/writer"
+	w "github.com/core-go/sql/writer"
 	_ "github.com/lib/pq"
 )
 
@@ -25,7 +25,6 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
-	userType := reflect.TypeOf(User{})
 	fileType := reader.DelimiterType
 	filename := ""
 	if fileType == reader.DelimiterType {
@@ -37,7 +36,6 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 		fullPath := filepath.Join("export", filename)
 		return fullPath
 	}
-	//reader, err := NewFixedlengthFileReader(generateFileName)
 	reader, err := reader.NewDelimiterFileReader(generateFileName)
 	if err != nil {
 		return nil, err
@@ -46,19 +44,20 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 		"app": "import users",
 		"env": "dev",
 	}
-	ff2, err := formatter.NewDelimiterFormatter[User](",")
+	transformer, err := transform.NewDelimiterTransformer[User](",")
 	if err != nil {
 		return nil, err
 	}
 	logError := importer.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
-	writer := writer.NewStreamWriter(db, "userimport", userType, 6)
+	userType := reflect.TypeOf(User{})
+	writer := w.NewStreamWriter(db, "userimport", userType, 6)
 	w2 := &UserWriter{writer}
 	// writer := q.NewInserter(db, "userimport", userType)
 	validator, err := v.NewValidator[*User]()
 	if err != nil {
 		return nil, err
 	}
-	importer := importer.NewImporter[User](ff2.ToStruct, reader.Read, logError.HandleException, validator.Validate, logError.HandleError, filename, w2.Write, writer.Flush)
+	importer := importer.NewImporter[User](transformer.ToStruct, reader.Read, logError.HandleException, validator.Validate, logError.HandleError, filename, w2.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
 }
 
@@ -73,7 +72,7 @@ type User struct {
 }
 
 type UserWriter struct {
-	wr *writer.StreamWriter
+	wr *w.StreamWriter
 }
 
 func (w *UserWriter) Write(ctx context.Context, model *User) error {
