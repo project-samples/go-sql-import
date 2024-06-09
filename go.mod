@@ -6,7 +6,7 @@ require (
 	github.com/core-go/config v1.0.1
 	github.com/core-go/io v0.2.7
 	github.com/core-go/log v0.1.2
-	github.com/core-go/sql v0.5.8
+	github.com/core-go/sql v0.5.11
 	github.com/lib/pq v1.10.9
 )
 

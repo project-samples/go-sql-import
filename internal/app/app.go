@@ -2,8 +2,8 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"path/filepath"
-	"reflect"
 	"time"
 
 	"github.com/core-go/io/importer"
@@ -11,7 +11,6 @@ import (
 	"github.com/core-go/io/transform"
 	v "github.com/core-go/io/validator"
 	"github.com/core-go/log"
-	q "github.com/core-go/sql"
 	w "github.com/core-go/sql/writer"
 	_ "github.com/lib/pq"
 )
@@ -21,7 +20,7 @@ type ApplicationContext struct {
 }
 
 func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
-	db, err := q.OpenByConfig(cfg.Sql)
+	db, err := sql.Open(cfg.Sql.Driver, cfg.Sql.DataSourceName)
 	if err != nil {
 		return nil, err
 	}
@@ -40,10 +39,6 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
-	mp := map[string]interface{}{
-		"app": "import users",
-		"env": "dev",
-	}
 	transformer, err := transform.NewDelimiterTransformer[User](",")
 	if err != nil {
 		return nil, err
@@ -52,12 +47,13 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
+	mp := map[string]interface{}{
+		"app": "import users",
+		"env": "dev",
+	}
 	errorHandler := importer.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
-	userType := reflect.TypeOf(User{})
-	writer := w.NewStreamWriter(db, "userimport", userType, 6)
-	w2 := &UserWriter{writer}
-	// writer := q.NewInserter(db, "userimport", userType)
-	importer := importer.NewImporter[User](reader.Read, transformer.Transform, validator.Validate, errorHandler.HandleError, errorHandler.HandleException, filename, w2.Write, writer.Flush)
+	writer := w.NewStreamWriter[*User](db, "userimport", 6)
+	importer := importer.NewImporter[User](reader.Read, transformer.Transform, validator.Validate, errorHandler.HandleError, errorHandler.HandleException, filename, writer.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
 }
 
@@ -69,16 +65,4 @@ type User struct {
 	Status      bool       `json:"status" gorm:"column:status" true:"1" false:"0" bson:"status" dynamodbav:"status" format:"%5s" length:"5" firestore:"status"`
 	CreatedDate *time.Time `json:"createdDate" gorm:"column:createdDate" bson:"createdDate" length:"10" format:"dateFormat:2006-01-02" dynamodbav:"createdDate" firestore:"createdDate" validate:"required"`
 	Test        string     `json:"test" gorm:"-" bson:"phone" dynamodbav:"phone" firestore:"phone" length:"0" format:"-"`
-}
-
-type UserWriter struct {
-	wr *w.StreamWriter
-}
-
-func (w *UserWriter) Write(ctx context.Context, model *User) error {
-	return w.wr.Write(ctx, model)
-}
-
-func (w *UserWriter) Flush(ctx context.Context) error {
-	return w.wr.Flush(ctx)
 }
