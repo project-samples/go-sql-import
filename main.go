@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/core-go/config"
-	"github.com/core-go/log"
 	"github.com/core-go/log/rotatelogs"
+	"github.com/core-go/log/zap"
 
 	"go-service/internal/app"
 )
@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	log.Initialize(cfg.Log, rotatelogs.GetWriter)
+	log.InitializeWithWriter(cfg.Log, rotatelogs.GetWriter)
 	ctx := context.Background()
 	log.Info(ctx, "Import file")
 	app, err := app.NewApp(ctx, cfg)

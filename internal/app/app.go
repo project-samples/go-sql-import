@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/core-go/io/importer"
+	im "github.com/core-go/io/importer"
 	"github.com/core-go/io/reader"
 	"github.com/core-go/io/transform"
 	v "github.com/core-go/io/validator"
-	"github.com/core-go/log"
+	"github.com/core-go/log/zap"
 	w "github.com/core-go/sql/writer"
 	_ "github.com/lib/pq"
 )
@@ -51,9 +51,9 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 		"app": "import users",
 		"env": "dev",
 	}
-	errorHandler := importer.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
+	errorHandler := im.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
 	writer := w.NewStreamWriter[*User](db, "userimport", 6)
-	importer := importer.NewImporter[User](reader.Read, transformer.Transform, validator.Validate, errorHandler.HandleError, errorHandler.HandleException, filename, writer.Write, writer.Flush)
+	importer := im.NewImporter[User](reader.Read, transformer.Transform, validator.Validate, errorHandler.HandleError, errorHandler.HandleException, filename, writer.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
 }
 
