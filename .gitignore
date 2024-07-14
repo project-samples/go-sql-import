@@ -19,3 +19,4 @@
 .idea
 *.SVN
 logs
+.DS_Store

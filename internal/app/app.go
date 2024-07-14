@@ -7,11 +7,11 @@ import (
 	"time"
 
 	im "github.com/core-go/io/importer"
-	"github.com/core-go/io/reader"
+	rd "github.com/core-go/io/reader"
+	w "github.com/core-go/io/sql"
 	"github.com/core-go/io/transform"
 	v "github.com/core-go/io/validator"
 	"github.com/core-go/log/zap"
-	w "github.com/core-go/sql/writer"
 	_ "github.com/lib/pq"
 )
 
@@ -24,9 +24,9 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
-	fileType := reader.DelimiterType
+	fileType := rd.DelimiterType
 	filename := ""
-	if fileType == reader.DelimiterType {
+	if fileType == rd.DelimiterType {
 		filename = "delimiter.csv"
 	} else {
 		filename = "fixedlength.csv"
@@ -35,7 +35,7 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 		fullPath := filepath.Join("export", filename)
 		return fullPath
 	}
-	reader, err := reader.NewDelimiterFileReader(generateFileName)
+	reader, err := rd.NewDelimiterFileReader(generateFileName)
 	if err != nil {
 		return nil, err
 	}
