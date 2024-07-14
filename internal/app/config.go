@@ -1,10 +1,7 @@
 package app
 
-import "github.com/core-go/log/zap"
-
 type Config struct {
-	Sql SqlConfig  `mapstructure:"sql"`
-	Log log.Config `mapstructure:"log"`
+	Sql SqlConfig `mapstructure:"sql"`
 }
 
 type SqlConfig struct {
