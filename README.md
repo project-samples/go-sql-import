@@ -1,4 +1,4 @@
-# go-import
+# go-sql-import
 
 ## Import flow
 ![Import flow with data validation](https://cdn-images-1.medium.com/max/800/1*Y4QUN6QnfmJgaKigcNHbQA.png)

@@ -1,5 +1,5 @@
-github.com/core-go/io v1.0.2 h1:DrK1flUKpPZz3Lr6obC6nFBf57garICIaP8ccBmfViI=
-github.com/core-go/io v1.0.2/go.mod h1:sCppNnbU1c+Eff3Oy782QcZdndXoKzeBPSP3UI4jW2w=
+github.com/core-go/io v1.0.4 h1:SIaQxpw3IlBGx52FlnpjYcot5wE1Gv2M5g1UHMvV9yE=
+github.com/core-go/io v1.0.4/go.mod h1:sCppNnbU1c+Eff3Oy782QcZdndXoKzeBPSP3UI4jW2w=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gabriel-vasile/mimetype v1.4.4 h1:QjV6pZ7/XZ7ryI2KuyeEDE8wnh7fHP9YnQy+R0LnH8I=
