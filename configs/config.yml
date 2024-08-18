@@ -1,6 +1,6 @@
 sql:
   driver: postgres
-  data_source_name: postgres://postgres:abcd1234@localhost/masterdata?sslmode=disable
+  data_source_name: postgres://postgres:abcd1234@localhost/importdb?sslmode=disable
 #  data_source_name: sql6527643:mjrF7i7iMJ@sql6.freemysqlhosting.net:3306/sql6527643?charset=utf8&parseTime=True&loc=Local
 
 log:

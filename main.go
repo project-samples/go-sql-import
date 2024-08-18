@@ -4,27 +4,33 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/core-go/config"
+	"github.com/core-go/log/rotatelogs"
+	"github.com/core-go/log/zap"
+
 	"go-service/internal/app"
 )
 
 func main() {
 	var cfg app.Config
-	cfg.Sql.Driver = "postgres"
-	cfg.Sql.DataSourceName = "postgres://postgres:abcd1234@localhost/masterdata?sslmode=disable"
-
+	err := config.Load(&cfg, "configs/config")
+	if err != nil {
+		panic(err)
+	}
+	log.InitializeWithWriter(cfg.Log, rotatelogs.GetWriter)
 	ctx := context.Background()
-	fmt.Println("Import file")
+	log.Info(ctx, "Import file")
 	app, err := app.NewApp(ctx, cfg)
 	if err != nil {
-		fmt.Println("Error when initialize: ", err.Error())
+		log.Errorf(ctx, "Error when initialize: %v", err)
 		panic(err)
 	}
 
 	total, success, err := app.Import(ctx)
 	if err != nil {
-		fmt.Println("Error when import: ", err.Error())
+		log.Errorf(ctx, "Error when import: %v", err)
 		panic(err)
 	}
-	fmt.Println(fmt.Sprintf("total: %d, success: %d", total, success))
-	fmt.Println(ctx, "Imported file")
+	log.Info(ctx, fmt.Sprintf("total: %d, success: %d", total, success))
+	log.Info(ctx, "Imported file")
 }
