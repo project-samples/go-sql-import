@@ -3,8 +3,8 @@ module go-service
 go 1.18
 
 require (
-	github.com/core-go/config v1.0.1
-	github.com/core-go/io v1.0.2
+	github.com/core-go/config v1.0.2
+	github.com/core-go/io v1.0.4
 	github.com/core-go/log v0.1.2
 	github.com/lib/pq v1.10.9
 )
@@ -42,7 +42,7 @@ require (
 	golang.org/x/exp v0.0.0-20240604190554-fc45aab8b7f8 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/text v0.17.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
