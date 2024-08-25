@@ -12,17 +12,18 @@ This article outlines strategies for high-performance batch processing in GOLANG
 - Disk: SSD KINGSTON SA400S37240G ATA Device
 - Exec File Size: 12M
 - Database: PosgreSQL 16
-- Total of rows: 1.018.584 rows
-- Total of columns: 76 columns
+- Total of rows: 1,018,584 rows
+- Total of columns: 76 columns.
+  - 20% of columns are datetime, it means to take time to parse string to datetime.
+- Power Usage: Moderate
 
+Results to import 1,018,584 rows into PostgreSQL:
 <table><thead><tr>
 <td>Type</td>
 <td>File Size</td>
-<td>Rows</td>
 <td>CPU</td>
 <td>RAM</td>
 <td>Disk</td>
-<td>Power Usage</td>
 <td>Without data validation</td>
 <td>With data validation</td>
 </tr></thead><tbody>
@@ -30,11 +31,9 @@ This article outlines strategies for high-performance batch processing in GOLANG
 <tr>
 <td>Fix Length</td>
 <td>1.15 GB</td>
-<td>1,018,584</td>
 <td>6.6%</td>
 <td>33 M</td>
 <td>3.1 M/s</td>
-<td>Moderate</td>
 <td>5 min 16 sec</td>
 <td>6 min 10 sec</td>
 </tr>
@@ -42,19 +41,18 @@ This article outlines strategies for high-performance batch processing in GOLANG
 <tr>
 <td>CSV</td>
 <td>0.975 GB</td>
-<td>1,018,584</td>
 <td>8%</td>
 <td>34 M</td>
 <td>2.8 M/s</td>
-<td>Moderate</td>
 <td>5 min 12 sec</td>
 <td>6 min</td>
 </tr>
 
 </tbody></table>
 
-- For fix length format file, please unzip 'fixedlength_big.7z' file (1.15 GB)
-- For CSV file, please unzip 'delimiter_big.7z' file (0.975 GB)
+#### Test data 
+- For fix length format file, please unzip 'data/fixedlength_big.7z' file (1.15 GB)
+- For CSV file, please unzip 'data/delimiter_big.7z' file (0.975 GB)
 
 ### Batch jobs
 Differ from online processing:
