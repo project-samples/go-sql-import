@@ -39,13 +39,23 @@ Results to import 1,018,584 rows into PostgreSQL:
 </tr>
 
 <tr>
-<td>CSV</td>
+<td>Delimiter</td>
 <td>0.975 GB</td>
 <td>8%</td>
 <td>34 M</td>
 <td>2.8 M/s</td>
+<td>5 min 9 sec</td>
+<td>5 min 57 sec</td>
+</tr>
+
+<tr>
+<td>CSV</td>
+<td>0.975 GB</td>
+<td>5.2%</td>
+<td>26 M</td>
+<td>3 M/s</td>
 <td>5 min 12 sec</td>
-<td>6 min</td>
+<td>5 min 58 sec</td>
 </tr>
 
 </tbody></table>
@@ -81,14 +91,6 @@ However, it’s important to note that bulk inserts still need to ensure data in
 - In this sample, we use Batch Inserts. We still have a very good performance.
 #### Error Handling and Logging:
 - Implement robust error handling and logging. Track failed records to reprocess or fix them later.
-
-### Advantages of This Approach
-- <b>Efficiency</b>: Streaming and batching minimize memory usage and reduce database transaction overhead.
-- <b>Scalability</b>: Parallel processing allows you to scale the import process across multiple cores.
-- <b>Flexibility</b>: This approach can handle large datasets and can be adapted for other file formats or databases.
-### Disadvantages
-- <b>Simple</b>: Do not handle retries or parallel processing.
-- <b>Transaction Size</b>: Large batches can still strain the database if not managed properly.
 
 ### Conclusion
 By carefully handling file I/O, database interactions, and error management, you can ensure high performance when importing large datasets into SQL.

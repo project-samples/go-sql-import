@@ -92,3 +92,4 @@ create table if not exists userimport (
 
     primary key (id)
 );
+create index idx_userimport_createddate on userimport(createddate);

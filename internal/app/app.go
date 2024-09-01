@@ -3,14 +3,13 @@ package app
 import (
 	"context"
 	"database/sql"
-	v "github.com/core-go/io/validator"
 	"path/filepath"
 	"time"
 
 	im "github.com/core-go/io/importer"
 	rd "github.com/core-go/io/reader"
 	w "github.com/core-go/io/sql"
-	"github.com/core-go/io/transform"
+	v "github.com/core-go/io/validator"
 	"github.com/core-go/log/zap"
 	_ "github.com/lib/pq"
 )
@@ -27,19 +26,19 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	fileType := rd.FixedlengthType
 	filename := ""
 	if fileType == rd.DelimiterType {
-		filename = "delimiter_big.csv"
+		filename = "delimiter.csv"
 	} else {
-		filename = "fixedlength_big.csv"
+		filename = "fixedlength.csv"
 	}
 	generateFileName := func() string {
 		fullPath := filepath.Join("data", filename)
 		return fullPath
 	}
-	reader, err := rd.NewFixedlengthFileReader(generateFileName)
+	reader, err := rd.NewFileReader(generateFileName)
 	if err != nil {
 		return nil, err
 	}
-	transformer, err := transform.NewFixedLengthTransformer[User]()
+	transformer, err := rd.NewFixedLengthTransformer[User]()
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +50,7 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 		"app": "import users",
 		"env": "dev",
 	}
-	errorHandler := im.NewErrorHandler[*User](log.ErrorFields, "fileName", "lineNo", mp)
+	errorHandler := im.NewErrorHandler[*User, string](log.ErrorFields, "fileName", "lineNo", mp)
 	writer := w.NewStreamInserter[*User](db, "userimport", 1000)
 	importer := im.NewImporter[User](reader.Read, transformer.Transform, validator.Validate, errorHandler.HandleError, errorHandler.HandleException, filename, writer.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
