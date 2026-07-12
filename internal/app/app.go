@@ -23,7 +23,7 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 	if err != nil {
 		return nil, err
 	}
-	fileType := rd.DelimiterType
+	fileType := rd.FixedlengthType
 	filename := ""
 	if fileType == rd.DelimiterType {
 		filename = "delimiter.csv"
@@ -34,11 +34,11 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 		fullPath := filepath.Join("data", filename)
 		return fullPath
 	}
-	reader, err := rd.NewCSVReader(',', generateFileName)
+	reader, err := rd.NewFileReader(generateFileName)
 	if err != nil {
 		return nil, err
 	}
-	transformer, err := rd.NewCSVTransformer[User]()
+	transformer, err := rd.NewFixedLengthTransformer[User]()
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +50,9 @@ func NewApp(ctx context.Context, cfg Config) (*ApplicationContext, error) {
 		"app": "import users",
 		"env": "dev",
 	}
-	errorHandler := im.NewErrorHandler[*User, []string](log.ErrorFields, "fileName", "lineNo", mp)
+	errorHandler := im.NewErrorHandler[*User, string](log.ErrorFields, "fileName", "lineNo", mp)
 	writer := w.NewStreamInserter[*User](db, "userimport", 1000)
-	importer := im.NewImporter[User](reader.Read, transformer.Transform, validator.Validate, errorHandler.HandleError, errorHandler.HandleException, filename, writer.Write, writer.Flush)
+	importer := im.NewImporter(reader.Read, transformer.Transform, validator.Validate, errorHandler.HandleError, errorHandler.HandleException, filename, writer.Write, writer.Flush)
 	return &ApplicationContext{Import: importer.Import}, nil
 }
 
